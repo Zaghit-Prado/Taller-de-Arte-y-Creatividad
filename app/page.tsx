@@ -450,11 +450,7 @@ export default function Home() {
             )}
           </div>
 
-          <div className="stat-row" style={{ marginTop:"2rem" }}>
-            <div className="port-stat"><span>50+</span><p>Proyectos completados</p></div>
-            <div className="port-stat"><span>30+</span><p>Empresas e instituciones</p></div>
-            <div className="port-stat"><span>10+</span><p>Años de experiencia</p></div>
-          </div>
+        
 
           <div className="cta-row" style={{ marginTop:"2rem" }}>
             <button className="btn btn-gold" onClick={() => toast("Descargando dossier de proyectos...", "info")}>
