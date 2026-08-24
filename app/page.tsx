@@ -94,17 +94,19 @@ export default function Home() {
   const [productosDin, setProductosDin] = useState<Product[]>([]);
   const [cargando, setCargando] = useState(true);
 
-  // 2. Añade el useEffect para leer el Google Sheet
+// 2. Añade el useEffect para leer el Google Sheet
   useEffect(() => {
-    // Reemplaza esto con tu link publicado de Google Sheets
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=0&single=true&output=csv";
+    // Generamos un número único basado en la hora actual para romper la caché del navegador
+    const cacheBuster = new Date().getTime();
+    
+    // Le pegamos ese número al final de tu URL original usando "&t="
+    const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=0&single=true&output=csv&t=${cacheBuster}`;
 
     Papa.parse(SHEET_CSV_URL, {
       download: true,
-      header: true, // Usa la primera fila como nombres de las propiedades
-      dynamicTyping: true, // Convierte números automáticamente (ej. el precio)
+      header: true, 
+      dynamicTyping: true, 
       complete: (results) => {
-        // results.data contiene tu array de objetos listo para usar
         setProductosDin(results.data as Product[]);
         setCargando(false);
       },
