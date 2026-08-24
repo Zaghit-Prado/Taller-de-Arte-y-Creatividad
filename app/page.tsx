@@ -511,9 +511,22 @@ export default function Home() {
           </div>
 
           <div className="filt-nav">
-            {[["todos","Todos"],["pinturas","Pinturas"],["prints","Prints Digitales"],["esculturas","Esculturas"],["manualidades","Manualidades"]].map(([f,label]) => (
-              <button key={f} className={`filt ${storeFilter === f ? "active" : ""}`} onClick={() => setStoreFilter(f)}>
-                {label}
+            {/* 1. El botón "Todos" siempre queda fijo al inicio */}
+            <button 
+              className={`filt ${storeFilter === "todos" ? "active" : ""}`} 
+              onClick={() => setStoreFilter("todos")}
+            >
+              Todos
+            </button>
+            
+            {/* 2. Generamos los botones leyendo las categorías de tu Google Sheet sin repetirlas */}
+            {Array.from(new Map(productosDin.filter(p => p.cat).map(p => [p.cat, p.catLabel])).entries()).map(([f, label]) => (
+              <button 
+                key={f as string} 
+                className={`filt ${storeFilter === f ? "active" : ""}`} 
+                onClick={() => setStoreFilter(f as string)}
+              >
+                {label as string}
               </button>
             ))}
           </div>
