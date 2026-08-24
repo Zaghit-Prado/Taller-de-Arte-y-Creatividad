@@ -22,6 +22,7 @@ interface Product {
 
 interface GalItem {
   cat: string;
+  catLabel?: string; // Agregamos esto como opcional
   alt: string;
   label: string;
   img: string;
@@ -90,29 +91,35 @@ export default function Home() {
   const podTimers = useRef<Record<number, ReturnType<typeof setInterval>>>({});
   const toastId   = useRef(0);
  
-  // 1. Añade un estado para tus productos dinámicos
+// Estados para Tienda
   const [productosDin, setProductosDin] = useState<Product[]>([]);
   const [cargando, setCargando] = useState(true);
 
-// 2. Añade el useEffect para leer el Google Sheet
+  // NUEVO: Estados para Portafolio
+  const [portafolioDin, setPortafolioDin] = useState<GalItem[]>([]);
+  const [cargandoPort, setCargandoPort] = useState(true);
+
+  // LECTURA DE GOOGLE SHEETS
   useEffect(() => {
-    // Generamos un número único basado en la hora actual para romper la caché del navegador
     const cacheBuster = new Date().getTime();
     
-    // Le pegamos ese número al final de tu URL original usando "&t="
-    const SHEET_CSV_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=0&single=true&output=csv&t=${cacheBuster}`;
-
-    Papa.parse(SHEET_CSV_URL, {
-      download: true,
-      header: true, 
-      dynamicTyping: true, 
+    // 1. Cargar Tienda (Hoja 1)
+    const SHEET_TIENDA_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=0&single=true&output=csv&t=${cacheBuster}`;
+    Papa.parse(SHEET_TIENDA_URL, {
+      download: true, header: true, dynamicTyping: true, 
       complete: (results) => {
         setProductosDin(results.data as Product[]);
         setCargando(false);
-      },
-      error: (error) => {
-        console.error("Error cargando productos:", error);
-        setCargando(false);
+      }
+    });
+
+    // 2. Cargar Portafolio (Hoja 2) - Reemplaza TU_NUEVO_GID por el número que te dio el link
+    const SHEET_PORTAFOLIO_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=303872850&single=true&output=csv&t=${cacheBuster}`;
+    Papa.parse(SHEET_PORTAFOLIO_URL, {
+      download: true, header: true, dynamicTyping: true, 
+      complete: (results) => {
+        setPortafolioDin(results.data as GalItem[]);
+        setCargandoPort(false);
       }
     });
   }, []);
@@ -404,25 +411,43 @@ export default function Home() {
             <h3>Proyectos Realizados</h3>
           </div>
 
-          {/* Tabs */}
+{/* Tabs Dinámicos */}
           <div className="tab-nav">
-            {[["todos","Todos"],["murales","Murales Urbanos"],["logotipos","Diseño de Logotipos"],["alfombras","Alfombras Institucionales"]].map(([f,label]) => (
-              <button key={f} className={`tab ${activeTab === f ? "active" : ""}`} onClick={() => setActiveTab(f)}>
-                {label}
+            <button 
+              className={`tab ${activeTab === "todos" ? "active" : ""}`} 
+              onClick={() => setActiveTab("todos")}
+            >
+              Todos
+            </button>
+            {Array.from(new Map(portafolioDin.filter(g => g.cat).map(g => [g.cat, g.catLabel || g.cat])).entries()).map(([f, label]) => (
+              <button 
+                key={f as string} 
+                className={`tab ${activeTab === f ? "active" : ""}`} 
+                onClick={() => setActiveTab(f as string)}
+              >
+                {label as string}
               </button>
             ))}
           </div>
 
+          {/* Galería Dinámica */}
           <div className="gal-grid">
-            {PORT_ITEMS.filter(g => visible(g.cat, activeTab)).map((g, i) => (
-              <div key={i} className="gal-item" onClick={() => openLB(g.img)}>
-                <Image src={g.img} alt={g.alt} fill style={{ objectFit:"cover", borderRadius:0 }} />
-                <div className="gal-ov">
-                  <i className="fa fa-expand" />
-                  <span>{g.label}</span>
+            {cargandoPort ? (
+              <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "var(--t-muted)" }}>
+                Cargando portafolio...
+              </p>
+            ) : (
+              portafolioDin.filter(g => visible(g.cat, activeTab)).map((g, i) => (
+                <div key={i} className="gal-item" onClick={() => openLB(g.img)}>
+                  {/* Ya aplicamos el <img /> directo para evitar errores 400 */}
+                  <img src={g.img} alt={g.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
+                  <div className="gal-ov">
+                    <i className="fa fa-expand" />
+                    <span>{g.label}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           <div className="stat-row" style={{ marginTop:"2rem" }}>
