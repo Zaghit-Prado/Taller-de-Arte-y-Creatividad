@@ -523,9 +523,9 @@ export default function Home() {
     productosDin.filter(p => visible(p.cat, storeFilter)).map((p, index) => (
       <div key={p.id || index} className="prod-card">
         <div className="prod-thumb">
-          <Image src={p.img} alt={p.name} fill style={{ objectFit:"cover", borderRadius:0 }} />
-          {p.badge && <span className="prod-badge">{p.badge}</span>}
-        </div>
+              <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
+              {p.badge && <span className="prod-badge">{p.badge}</span>}
+            </div>
         <div className="prod-body">
           <p className="prod-cat">{p.catLabel}</p>
           <h4>{p.name}</h4>
@@ -593,7 +593,7 @@ export default function Home() {
               <div className="media-bento">
                 {/* Video Destacado (Izquierda) */}
                 <div className="vid-card-styled featured">
-                  <Image src={VIDEOS_DATA[0].img} alt={VIDEOS_DATA[0].title} fill style={{ objectFit: "cover", borderRadius: 0 }} />
+                  <img src={VIDEOS_DATA[0].img} alt={VIDEOS_DATA[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
                   <div className="vid-badge" style={{ background: VIDEOS_DATA[0].badgeColor }}>{VIDEOS_DATA[0].badge}</div>
                   <div className="vid-play-btn-large"><i className="fa fa-play" /></div>
                   <div className="vid-info">
@@ -604,9 +604,9 @@ export default function Home() {
 
                 {/* Videos Pequeños (Derecha) */}
                 <div className="media-bento-right">
-                  {VIDEOS_DATA.slice(1).map((v, i) => (
+                 {VIDEOS_DATA.slice(1).map((v, i) => (
                     <div key={i} className="vid-card-styled small">
-                      <Image src={v.img} alt={v.title} fill style={{ objectFit: "cover", borderRadius: 0 }} />
+                      <img src={v.img} alt={v.title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
                       <div className="vid-badge" style={{ background: v.badgeColor }}>{v.badge}</div>
                       <div className="vid-info">
                         <h3>{v.title}</h3>
