@@ -603,7 +603,7 @@ export default function Home() {
                 </div>
 
                 {/* Videos Pequeños (Derecha) */}
-                <div className="media-bento-right">
+                <div className="media-bento-right"> 
                  {VIDEOS_DATA.slice(1).map((v, i) => (
                     <div key={i} className="vid-card-styled small">
                       <img src={v.img} alt={v.title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
