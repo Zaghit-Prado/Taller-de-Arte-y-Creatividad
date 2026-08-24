@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
-
+import Papa from "papaparse";
 // ─── TYPES ────────────────────────────────────────────────────
 interface CartItem {
   name: string;
@@ -89,7 +89,31 @@ export default function Home() {
   const [podPct, setPodPct]         = useState<Record<number, number>>({});
   const podTimers = useRef<Record<number, ReturnType<typeof setInterval>>>({});
   const toastId   = useRef(0);
+ 
+  // 1. Añade un estado para tus productos dinámicos
+  const [productosDin, setProductosDin] = useState<Product[]>([]);
+  const [cargando, setCargando] = useState(true);
 
+  // 2. Añade el useEffect para leer el Google Sheet
+  useEffect(() => {
+    // Reemplaza esto con tu link publicado de Google Sheets
+    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=0&single=true&output=csv";
+
+    Papa.parse(SHEET_CSV_URL, {
+      download: true,
+      header: true, // Usa la primera fila como nombres de las propiedades
+      dynamicTyping: true, // Convierte números automáticamente (ej. el precio)
+      complete: (results) => {
+        // results.data contiene tu array de objetos listo para usar
+        setProductosDin(results.data as Product[]);
+        setCargando(false);
+      },
+      error: (error) => {
+        console.error("Error cargando productos:", error);
+        setCargando(false);
+      }
+    });
+  }, []);
   /* scroll */
   useEffect(() => {
     const onScroll = () => setShrunk(window.scrollY > 80);
@@ -492,25 +516,29 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="prod-grid">
-            {PRODUCTS.filter(p => visible(p.cat, storeFilter)).map(p => (
-              <div key={p.id} className="prod-card">
-                <div className="prod-thumb">
-                  <Image src={p.img} alt={p.name} fill style={{ objectFit:"cover", borderRadius:0 }} />
-                  {p.badge && <span className="prod-badge">{p.badge}</span>}
-                </div>
-                <div className="prod-body">
-                  <p className="prod-cat">{p.catLabel}</p>
-                  <h4>{p.name}</h4>
-                  <p>{p.desc}</p>
-                  <div className="prod-price">S/ {p.price}</div>
-                  <button className="btn-buy" onClick={() => addCart(p.name, p.price)}>
-                    <i className="fa fa-whatsapp" /> Comprar
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+  <div className="prod-grid">
+  {cargando ? (
+    <p>Cargando catálogo...</p>
+  ) : (
+    productosDin.filter(p => visible(p.cat, storeFilter)).map((p, index) => (
+      <div key={p.id || index} className="prod-card">
+        <div className="prod-thumb">
+          <Image src={p.img} alt={p.name} fill style={{ objectFit:"cover", borderRadius:0 }} />
+          {p.badge && <span className="prod-badge">{p.badge}</span>}
+        </div>
+        <div className="prod-body">
+          <p className="prod-cat">{p.catLabel}</p>
+          <h4>{p.name}</h4>
+          <p>{p.desc}</p>
+          <div className="prod-price">S/ {p.price}</div>
+          <button className="btn-buy" onClick={() => addCart(p.name, p.price)}>
+            <i className="fa fa-whatsapp" /> Comprar
+          </button>
+        </div>
+      </div>
+    ))
+  )}
+</div>
 
           {/* Métodos de pago */}
           <div className="pay-strip">
