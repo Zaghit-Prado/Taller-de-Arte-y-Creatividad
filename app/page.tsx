@@ -216,7 +216,7 @@ export default function Home() {
               width={52}
               height={52}
               className="logo-img"
-              style={{ borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+              style={{ borderRadius: "0%", objectFit: "cover", flexShrink: 0, filter: "none" }}
             />
             <span className="logo-text">Taller Estudio<span>Arte &amp; Creatividad</span></span>
           </a>
