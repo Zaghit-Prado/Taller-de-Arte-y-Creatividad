@@ -18,6 +18,10 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Taller de Arte & Creatividad — Lima",
   description: "Educación artística integral, proyectos corporativos y preparación para Bellas Artes en Lima, Perú. Desde 2015.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
