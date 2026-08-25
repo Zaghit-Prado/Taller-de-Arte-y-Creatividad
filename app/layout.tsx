@@ -30,6 +30,15 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
         />
+        {/* Favicon */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        {/* Apple */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        {/* PWA Manifest */}
+        <link rel="manifest" href="/site.webmanifest" />
+        <meta name="theme-color" content="#D4006A" />
       </head>
       <body>{children}</body>
     </html>
