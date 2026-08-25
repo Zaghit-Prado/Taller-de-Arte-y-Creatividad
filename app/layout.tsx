@@ -19,8 +19,11 @@ export const metadata: Metadata = {
   title: "Taller de Arte & Creatividad — Lima",
   description: "Educación artística integral, proyectos corporativos y preparación para Bellas Artes en Lima, Perú. Desde 2015.",
   icons: {
-    icon: "/logo.png",
+    icon: [
+      { url: "/logo.png", type: "image/png" },
+    ],
     apple: "/logo.png",
+    shortcut: "/logo.png",
   },
 };
 
