@@ -210,14 +210,9 @@ export default function Home() {
       <header id="hdr" className={shrunk ? "shrunk" : ""}>
         <div className="wrap">
           <a href="#inicio" className="logo" onClick={e => { e.preventDefault(); scrollTo("inicio"); }}>
-            <Image
-              src="/logo.png"
-              alt="Taller Estudio Arte & Creatividad"
-              width={52}
-              height={52}
-              className="logo-img"
-              style={{ borderRadius: "0%", objectFit: "cover", flexShrink: 0, filter: "none" }}
-            />
+            <div style={{ width:52, height:52, borderRadius:"50%", background:"linear-gradient(135deg,#D4006A,#0099C8)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:"1.4rem", flexShrink:0 }}>
+              <i className="fa fa-paint-brush" />
+            </div>
             <span className="logo-text">Taller Estudio<span>Arte &amp; Creatividad</span></span>
           </a>
 
@@ -716,13 +711,9 @@ export default function Home() {
         <div className="foot-grid">
           <div className="foot-brand">
             <div className="logo" style={{ marginBottom:"1rem" }}>
-             <Image
-  src="/logo.png"
-  alt="Taller Estudio Arte & Creatividad"
-  width={56}
-  height={44}
-  style={{ borderRadius: 0, objectFit: "contain", background: "transparent" }}
-/>
+              <div style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(135deg,#D4006A,#0099C8)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:"1.2rem" }}>
+                <i className="fa fa-paint-brush" />
+              </div>
               <span className="logo-text">Taller Estudio<span>Arte &amp; Creatividad</span></span>
             </div>
             <p>Transformamos la creatividad en éxito académico y profesional. Formando artistas desde 2015 en Lima, Perú.</p>
