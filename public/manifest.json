@@ -1,6 +1,7 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "Taller de Arte & Creatividad — Lima",
+  "short_name": "Taller Arte",
+  "description": "Educación artística integral, proyectos corporativos y preparación para Bellas Artes en Lima, Perú.",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
