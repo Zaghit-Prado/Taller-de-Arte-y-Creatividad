@@ -716,13 +716,13 @@ export default function Home() {
         <div className="foot-grid">
           <div className="foot-brand">
             <div className="logo" style={{ marginBottom:"1rem" }}>
-              <Image
-                src="/logo.png"
-                alt="Taller Estudio Arte & Creatividad"
-                width={44}
-                height={44}
-                style={{ borderRadius: "50%", objectFit: "cover" }}
-              />
+             <Image
+  src="/logo.png"
+  alt="Taller Estudio Arte & Creatividad"
+  width={56}
+  height={44}
+  style={{ borderRadius: 0, objectFit: "contain", background: "transparent" }}
+/>
               <span className="logo-text">Taller Estudio<span>Arte &amp; Creatividad</span></span>
             </div>
             <p>Transformamos la creatividad en éxito académico y profesional. Formando artistas desde 2015 en Lima, Perú.</p>
