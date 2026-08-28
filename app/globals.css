@@ -75,7 +75,13 @@ h4 { font-size: 1rem; }
 /* ===== LAYOUT ===== */
 .wrap        { max-width: 1280px; margin: 0 auto; padding: 0 5%; }
 .section-pad { padding: 5rem 5%; max-width: 1280px; margin: 0 auto; }
-
+/* AGREGAR — faltaba position:relative en el contenedor */
+.edu-col-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--matte);
+}
 /* ===== HEADER ===== */
 #hdr {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
@@ -108,6 +114,7 @@ h4 { font-size: 1rem; }
   transform: scaleX(0); transform-origin: left;
   transition: transform var(--ease);
 }
+
 .nav-list a:hover, .nav-list a.active { color: var(--blue); background: rgba(0,153,200,.08); }
 .nav-list a:hover::after, .nav-list a.active::after { transform: scaleX(1); }
 

@@ -104,7 +104,11 @@ export default function Home() {
     title: string; desc: string; btnText: string; scrollTo: string;
   }[]>([]);
   const [tallerGal, setTallerGal] = useState<{ alt: string; img: string }[]>([]);
-
+// Estado para Hero
+const [heroDin, setHeroDin] = useState<{
+  kicker: string; h1_line1: string; h1_em: string;
+  h1_line2: string; sub: string; btnText: string;
+} | null>(null);
   // LECTURA DE GOOGLE SHEETS
   useEffect(() => {
     const cacheBuster = new Date().getTime();
@@ -131,6 +135,14 @@ Papa.parse(SHEET_TALLER_URL, {
   download: true, header: true, dynamicTyping: true,
   complete: (results) => {
     setTallerGal(results.data as { alt: string; img: string }[]);
+  }
+});
+const SHEET_HERO_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=1839069743&single=true&output=csv&t=${cacheBuster}`;
+Papa.parse(SHEET_HERO_URL, {
+  download: true, header: true, dynamicTyping: true,
+  complete: (results) => {
+    const rows = results.data as typeof heroDin[];
+    if (rows.length > 0) setHeroDin(rows[0]);
   }
 });
     // 2. Cargar Portafolio (Hoja 2) - Reemplaza TU_NUEVO_GID por el número que te dio el link
@@ -287,25 +299,31 @@ Papa.parse(SHEET_TALLER_URL, {
         </ul>
       </div>
 
-      {/* ===== HERO ===== */}
-      <section id="inicio">
-        <div id="hero">
-          <div className="hero-inner">
-            <p className="hero-kicker">
-              <i className="fa fa-paint-brush" /> Lima, Perú &mdash; Desde 2015
-            </p>
-            <h1 className="hero-h1">
-              Creatividad que<br /><em>transforma</em> vidas
-            </h1>
-            <p className="hero-sub">
-              Educación artística integral, proyectos corporativos y preparación profesional para artistas del futuro.
-            </p>
-            <a href="#servicios" className="hero-cta" onClick={e => { e.preventDefault(); scrollTo("servicios"); }}>
-              <i className="fa fa-th-large" /> Catálogo de servicios
-            </a>
-          </div>
-        </div>
-      </section>
+{/* ===== HERO ===== */}
+<section id="inicio">
+  <div id="hero">
+    <div className="hero-inner">
+      <p className="hero-kicker">
+        <i className="fa fa-paint-brush" /> {heroDin?.kicker ?? "Lima, Perú — Desde 2015"}
+      </p>
+      <h1 className="hero-h1">
+        {heroDin?.h1_line1 ?? "Creatividad que"}<br />
+        <em>{heroDin?.h1_em ?? "transforma"}</em>{" "}
+        {heroDin?.h1_line2 ?? "vidas"}
+      </h1>
+      <p className="hero-sub">
+        {heroDin?.sub ?? "Educación artística integral, proyectos corporativos y preparación profesional para artistas del futuro."}
+      </p>
+      <a
+        href="#servicios"
+        className="hero-cta"
+        onClick={e => { e.preventDefault(); scrollTo("servicios"); }}
+      >
+        <i className="fa fa-th-large" /> {heroDin?.btnText ?? "Catálogo de servicios"}
+      </a>
+    </div>
+  </div>
+</section>
 
       {/* ===== SERVICIOS ===== */}
       <section id="servicios">
