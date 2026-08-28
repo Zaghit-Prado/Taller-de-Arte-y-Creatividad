@@ -466,7 +466,7 @@ Papa.parse(SHEET_HERO_URL, {
 
           <div className="sec-h">
             <span className="eyebrow">Portafolio</span>
-            <h3>Proyectos Realizados</h3>
+            <h3>Proyectos corporativos Realizados</h3>
           </div>
 
 {/* Tabs Dinámicos */}
