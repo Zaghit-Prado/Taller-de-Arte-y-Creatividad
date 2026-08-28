@@ -350,12 +350,22 @@ Papa.parse(SHEET_SERVICIOS_URL, {
             <p>Desde S/ 200 por mes &middot; Lunes a Sábado</p>
           </div>
 
-          <div className="gal-grid">
+          <div className="edu-collage">
             {EDU_GAL.map((g, i) => (
-              <div key={i} className="gal-item" onClick={() => openLB(g.img)}>
-                <Image src={g.img} alt={g.alt} fill style={{ objectFit:"cover", borderRadius:0 }} />
-                <div className="gal-ov">
-                  <i className="fa fa-search-plus" />
+              <div
+                key={i}
+                className={`edu-col-item edu-col-item--${i}`}
+                onClick={() => openLB(g.img)}
+              >
+                <img
+                  src={g.img}
+                  alt={g.alt}
+                  style={{ width:"100%", height:"100%", objectFit:"cover",
+                          display:"block", borderRadius:0 }}
+                  loading="lazy"
+                />
+                <div className="edu-col-ov">
+                  <i className="fa fa-expand" />
                   <span>{g.label}</span>
                 </div>
               </div>

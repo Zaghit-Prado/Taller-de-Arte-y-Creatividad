@@ -118,6 +118,96 @@ h4 { font-size: 1rem; }
   color: var(--ink); font-size: 1.05rem; cursor: pointer;
   padding: .3rem; transition: color var(--ease);
 }
+/* ── Collage Educación ─────────────────────────────────── */
+.edu-collage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 200px 160px;
+  gap: 10px;
+  margin: 1.5rem 0 2rem;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Item 0 — grande, ocupa 2 filas a la izquierda */
+.edu-col-item--0 {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+}
+
+/* Item 1 — arriba a la derecha, ancho */
+.edu-col-item--1 {
+  grid-column: 2 / 4;
+  grid-row: 1 / 2;
+}
+
+/* Item 2 — abajo a la derecha */
+.edu-col-item--2 {
+  grid-column: 2 / 4;
+  grid-row: 2 / 3;
+}
+
+.edu-col-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--canvas);
+}
+
+.edu-col-item img {
+  transition: transform 0.4s ease;
+}
+
+.edu-col-item:hover img {
+  transform: scale(1.06);
+}
+
+.edu-col-ov {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.42);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: #fff;
+  font-size: 0.85rem;
+  font-style: italic;
+  text-align: center;
+  padding: 1rem;
+}
+
+.edu-col-ov i {
+  font-size: 1.6rem;
+  color: var(--gold, #E2A800);
+}
+
+.edu-col-item:hover .edu-col-ov {
+  opacity: 1;
+}
+
+/* Mobile: vuelve a columna única */
+@media (max-width: 640px) {
+  .edu-collage {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 160px 130px 130px;
+  }
+  .edu-col-item--0 {
+    grid-column: 1 / 3;
+    grid-row: 1 / 2;
+  }
+  .edu-col-item--1 {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+  }
+  .edu-col-item--2 {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+  }
+}
 .cart-btn:hover { color: var(--gold); }
 .cart-badge {
   position: absolute; top: -4px; right: -4px;
