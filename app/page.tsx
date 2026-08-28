@@ -210,9 +210,13 @@ export default function Home() {
       <header id="hdr" className={shrunk ? "shrunk" : ""}>
         <div className="wrap">
           <a href="#inicio" className="logo" onClick={e => { e.preventDefault(); scrollTo("inicio"); }}>
-            <div style={{ width:52, height:52, borderRadius:"50%", background:"linear-gradient(135deg,#D4006A,#0099C8)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:"1.4rem", flexShrink:0 }}>
-              <i className="fa fa-paint-brush" />
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Taller Arte"
+              width={52}
+              height={52}
+              style={{ borderRadius:"50%", flexShrink:0, objectFit:"cover" }}
+            />
             <span className="logo-text">Taller Estudio<span>Arte &amp; Creatividad</span></span>
           </a>
 
