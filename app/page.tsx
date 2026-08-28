@@ -98,7 +98,11 @@ export default function Home() {
   // NUEVO: Estados para Portafolio
   const [portafolioDin, setPortafolioDin] = useState<GalItem[]>([]);
   const [cargandoPort, setCargandoPort] = useState(true);
-
+  // Estado para Servicios
+  const [serviciosDin, setServiciosDin] = useState<{
+    id: number; img: string; color: string; eyebrow: string;
+    title: string; desc: string; btnText: string; scrollTo: string;
+  }[]>([]);
   // LECTURA DE GOOGLE SHEETS
   useEffect(() => {
     const cacheBuster = new Date().getTime();
@@ -112,7 +116,14 @@ export default function Home() {
         setCargando(false);
       }
     });
-
+// Dentro del useEffect de Google Sheets, agrega:
+const SHEET_SERVICIOS_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=2076785391&single=true&output=csv&t=${cacheBuster}`;
+Papa.parse(SHEET_SERVICIOS_URL, {
+  download: true, header: true, dynamicTyping: true,
+  complete: (results) => {
+    setServiciosDin(results.data as typeof serviciosDin);
+  }
+});
     // 2. Cargar Portafolio (Hoja 2) - Reemplaza TU_NUEVO_GID por el número que te dio el link
     const SHEET_PORTAFOLIO_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=303872850&single=true&output=csv&t=${cacheBuster}`;
     Papa.parse(SHEET_PORTAFOLIO_URL, {
@@ -295,27 +306,33 @@ export default function Home() {
           <p>Soluciones artísticas especializadas para cada etapa de tu vida creativa</p>
         </div>
         <div className="quad-grid">
-          {[
-            { id:"educacion",       c:"red",   icon:"fa-pencil",        eyebrow:"Para niños y jóvenes",      title:"Educación y Talleres",    desc:"Clases particulares, talleres de verano y asesoría escolar especializada.",      btn:"Talleres y Asesoría" },
-            { id:"corporativo",     c:"blue",  icon:"fa-building",       eyebrow:"Para empresas e instituciones", title:"Proyectos Corporativos", desc:"Murales urbanos, logotipos y proyectos institucionales de alto impacto.",     btn:"Ver Portafolio B2B" },
-            { id:"preuniversitario",c:"green", icon:"fa-graduation-cap", eyebrow:"Preparación universitaria", title:"Preparación Bellas Artes", desc:"Programa intensivo para ingresar a la Escuela Nacional de Bellas Artes.",    btn:"Programa Pre-U" },
-            { id:"tienda",          c:"gold",  icon:"fa-shopping-bag",   eyebrow:"Galería y tienda",          title:"Tienda Galería",           desc:"Obras originales, prints digitales y artesanías para decorar tu espacio.",   btn:"Ver Galería" },
-          ].map(s => (
-            <div key={s.id} className="svc-card" data-c={s.c} onClick={() => scrollTo(s.id)}>
-              <div className="svc-thumb">
-                <Image src={IMG} alt={s.title} fill style={{ objectFit:"cover", borderRadius:0 }} />
-                <div className="svc-ico"><i className={`fa ${s.icon}`} /></div>
+          {serviciosDin.map(s => (
+              <div key={s.id} className="svc-card" data-c={s.color} onClick={() => scrollTo(s.scrollTo)}>
+                <div className="svc-thumb">
+                  <img src={s.img} alt={s.title}
+                    style={{ width:"100%", height:"100%", objectFit:"cover",
+                            borderRadius:0, position:"absolute", top:0, left:0 }}
+                    loading="lazy"
+                  />
+                  <div className="svc-ico">
+                    <i className={`fa ${
+                      s.color === "red"   ? "fa-pencil" :
+                      s.color === "blue"  ? "fa-building" :
+                      s.color === "green" ? "fa-graduation-cap" : "fa-shopping-bag"
+                    }`} />
+                  </div>
+                </div>
+                <div className="svc-body">
+                  <span className="eyebrow">{s.eyebrow}</span>
+                  <h3>{s.title}</h3>
+                  <p>{s.desc}</p>
+                  <a href={`#${s.scrollTo}`} className="btn-svc"
+                    onClick={e => { e.preventDefault(); scrollTo(s.scrollTo); }}>
+                    <i className="fa fa-arrow-right" /> {s.btnText}
+                  </a>
+                </div>
               </div>
-              <div className="svc-body">
-                <span className="eyebrow">{s.eyebrow}</span>
-                <h3>{s.title}</h3>
-                <p>{s.desc}</p>
-                <a href={`#${s.id}`} className="btn-svc" onClick={e => { e.preventDefault(); scrollTo(s.id); }}>
-                  <i className="fa fa-arrow-right" /> {s.btn}
-                </a>
-              </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
 
