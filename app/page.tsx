@@ -772,7 +772,7 @@ Papa.parse(SHEET_SERVICIOS_URL, {
       {/* ===== WA FLOAT ===== */}
       <button
         className="wa-float"
-        onClick={() => window.open("https://wa.me/51999999999?text=Hola, deseo información sobre sus servicios", "_blank")}
+        onClick={() => window.open("https://wa.me/5195929447?text=Hola, deseo información sobre sus servicios", "_blank")}
         title="WhatsApp"
       >
         <i className="fa fa-whatsapp" />
