@@ -340,7 +340,6 @@ Papa.parse(SHEET_HERO_URL, {
           </span>
           <div className="qr-app-chips">
             <span><i className="fa fa-android" /> Android</span>
-            <span><i className="fa fa-apple" /> iOS</span>
           </div>
         </div>
       </div>
