@@ -103,6 +103,8 @@ export default function Home() {
     id: number; img: string; color: string; eyebrow: string;
     title: string; desc: string; btnText: string; scrollTo: string;
   }[]>([]);
+  const [tallerGal, setTallerGal] = useState<{ alt: string; img: string }[]>([]);
+
   // LECTURA DE GOOGLE SHEETS
   useEffect(() => {
     const cacheBuster = new Date().getTime();
@@ -122,6 +124,13 @@ Papa.parse(SHEET_SERVICIOS_URL, {
   download: true, header: true, dynamicTyping: true,
   complete: (results) => {
     setServiciosDin(results.data as typeof serviciosDin);
+  }
+});
+const SHEET_TALLER_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=1153909406&single=true&output=csv&t=${cacheBuster}`;
+Papa.parse(SHEET_TALLER_URL, {
+  download: true, header: true, dynamicTyping: true,
+  complete: (results) => {
+    setTallerGal(results.data as { alt: string; img: string }[]);
   }
 });
     // 2. Cargar Portafolio (Hoja 2) - Reemplaza TU_NUEVO_GID por el número que te dio el link
@@ -350,27 +359,27 @@ Papa.parse(SHEET_SERVICIOS_URL, {
             <p>Desde S/ 200 por mes &middot; Lunes a Sábado</p>
           </div>
 
-          <div className="edu-collage">
-            {EDU_GAL.map((g, i) => (
-              <div
-                key={i}
-                className={`edu-col-item edu-col-item--${i}`}
-                onClick={() => openLB(g.img)}
-              >
-                <img
-                  src={g.img}
-                  alt={g.alt}
-                  style={{ width:"100%", height:"100%", objectFit:"cover",
-                          display:"block", borderRadius:0 }}
-                  loading="lazy"
-                />
-                <div className="edu-col-ov">
-                  <i className="fa fa-expand" />
-                  <span>{g.label}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+<div className="edu-collage">
+  {tallerGal.map((g, i) => (
+    <div
+      key={i}
+      className={`edu-col-item edu-col-item--${i % 7}`}
+      onClick={() => openLB(g.img)}
+    >
+      <img
+        src={g.img}
+        alt={g.alt}
+        style={{ width:"100%", height:"100%", objectFit:"cover",
+                 display:"block", borderRadius:0 }}
+        loading="lazy"
+      />
+      <div className="edu-col-ov">
+        <i className="fa fa-expand" />
+        <span>{g.alt}</span>
+      </div>
+    </div>
+  ))}
+</div>
 
           <div className="cta-row">
             <a href="https://wa.me/51999999999?text=Hola, deseo información sobre los talleres de arte para mi hijo" className="btn btn-wa" target="_blank" rel="noreferrer">
