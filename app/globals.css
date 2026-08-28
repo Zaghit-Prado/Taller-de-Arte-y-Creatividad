@@ -71,7 +71,68 @@ h4 { font-size: 1rem; }
   display: block;
   margin-bottom: .45rem;
 }
+/* ── QR App Banner ── */
+.qr-app-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  padding: 0.85rem 1.1rem;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 14px;
+  max-width: 360px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
 
+.qr-app-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.qr-app-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.qr-app-title .fa {
+  color: var(--red);
+  margin-right: 4px;
+}
+
+.qr-app-sub {
+  font-size: 0.78rem;
+  color: var(--t-muted);
+  line-height: 1.35;
+}
+
+.qr-app-chips {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.qr-app-chips span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: var(--ink);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+@media (max-width: 480px) {
+  .qr-app-banner {
+    max-width: 100%;
+  }
+}
 /* ===== LAYOUT ===== */
 .wrap        { max-width: 1280px; margin: 0 auto; padding: 0 5%; }
 .section-pad { padding: 5rem 5%; max-width: 1280px; margin: 0 auto; }

@@ -321,6 +321,30 @@ Papa.parse(SHEET_HERO_URL, {
       >
         <i className="fa fa-th-large" /> {heroDin?.btnText ?? "Catálogo de servicios"}
       </a>
+
+      {/* ── QR App Banner ── */}
+      <div className="qr-app-banner">
+        <Image
+          src="/taller/qr.png"
+          alt="QR Descarga App"
+          width={72}
+          height={72}
+          style={{ borderRadius: 8, flexShrink: 0, objectFit: "cover" }}
+        />
+        <div className="qr-app-text">
+          <span className="qr-app-title">
+            <i className="fa fa-mobile" /> Descarga nuestra app
+          </span>
+          <span className="qr-app-sub">
+            Escanea el QR con tu cámara y accede desde tu celular
+          </span>
+          <div className="qr-app-chips">
+            <span><i className="fa fa-android" /> Android</span>
+            <span><i className="fa fa-apple" /> iOS</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
