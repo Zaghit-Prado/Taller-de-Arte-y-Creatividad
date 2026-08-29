@@ -302,63 +302,45 @@ Papa.parse(SHEET_HERO_URL, {
 {/* ===== HERO ===== */}
 <section id="inicio">
   <div id="hero">
-    <div className="hero-layout">
+    <div className="hero-inner">
+      <p className="hero-kicker">
+        <i className="fa fa-paint-brush" /> {heroDin?.kicker ?? "Lima, Perú — Desde 2015"}
+      </p>
+      <h1 className="hero-h1">
+        {heroDin?.h1_line1 ?? "Creatividad que"}<br />
+        <em>{heroDin?.h1_em ?? "transforma"}</em>{" "}
+        {heroDin?.h1_line2 ?? "vidas"}
+      </h1>
+      <p className="hero-sub">
+        {heroDin?.sub ?? "Educación artística integral, proyectos corporativos y preparación profesional para artistas del futuro."}
+      </p>
+      <a
+        href="#servicios"
+        className="hero-cta"
+        onClick={e => { e.preventDefault(); scrollTo("servicios"); }}
+      >
+        <i className="fa fa-th-large" /> {heroDin?.btnText ?? "Catálogo de servicios"}
+      </a>
 
-      {/* Columna izquierda: texto */}
-      <div className="hero-inner">
-        <p className="hero-kicker">
-          <i className="fa fa-paint-brush" /> {heroDin?.kicker ?? "Lima, Perú — Desde 2015"}
-        </p>
-        <h1 className="hero-h1">
-          {heroDin?.h1_line1 ?? "Creatividad que"}<br />
-          <em>{heroDin?.h1_em ?? "transforma"}</em>{" "}
-          {heroDin?.h1_line2 ?? "vidas"}
-        </h1>
-        <p className="hero-sub">
-          {heroDin?.sub ?? "Educación artística integral, proyectos corporativos y preparación profesional para artistas del futuro."}
-        </p>
-        <a
-          href="#servicios"
-          className="hero-cta"
-          onClick={e => { e.preventDefault(); scrollTo("servicios"); }}
-        >
-          <i className="fa fa-th-large" /> {heroDin?.btnText ?? "Catálogo de servicios"}
-        </a>
-
-        {/* QR App Banner */}
-        <div className="qr-app-banner">
-          <Image
-            src="/taller/qr.png"
-            alt="QR Descarga App"
-            width={72}
-            height={72}
-            style={{ borderRadius: 8, flexShrink: 0, objectFit: "cover" }}
-          />
-          <div className="qr-app-text">
-            <span className="qr-app-title">
-              <i className="fa fa-mobile" /> Descarga nuestra app
-            </span>
-            <span className="qr-app-sub">
-              Escanea el QR con tu cámara y accede desde tu celular
-            </span>
-            <div className="qr-app-chips">
-              <span><i className="fa fa-android" /> Android</span>
-            </div>
+      {/* ── QR App Banner ── */}
+      <div className="qr-app-banner">
+        <Image
+          src="/taller/qr.png"
+          alt="QR Descarga App"
+          width={72}
+          height={72}
+          style={{ borderRadius: 8, flexShrink: 0, objectFit: "cover" }}
+        />
+        <div className="qr-app-text">
+          <span className="qr-app-title">
+            <i className="fa fa-mobile" /> Descarga nuestra app
+          </span>
+          <span className="qr-app-sub">
+            Escanea el QR con tu cámara y accede desde tu celular
+          </span>
+          <div className="qr-app-chips">
+            <span><i className="fa fa-android" /> Android</span>
           </div>
-        </div>
-      </div>
-
-      {/* Columna derecha: video decorativo */}
-      <div className="hero-video-col">
-        <div className="hero-video-frame">
-          <video
-            src="/taller/videoportada.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="hero-video"
-          />
         </div>
       </div>
 
