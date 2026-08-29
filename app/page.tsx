@@ -302,6 +302,21 @@ Papa.parse(SHEET_HERO_URL, {
 {/* ===== HERO ===== */}
 <section id="inicio">
   <div id="hero">
+    {/* Video de fondo en loop, sin audio, sin controles */}
+    <video
+      className="hero-video-bg"
+      src="/taller/videoportada.mp4"
+      autoPlay
+      loop
+      muted
+      playsInline
+      disablePictureInPicture
+      controlsList="nodownload nofullscreen noremoteplayback"
+    />
+
+    {/* Capa de gradiente semitransparente */}
+    <div className="hero-overlay" />
+
     <div className="hero-inner">
       <p className="hero-kicker">
         <i className="fa fa-paint-brush" /> {heroDin?.kicker ?? "Lima, Perú — Desde 2015"}
@@ -343,7 +358,6 @@ Papa.parse(SHEET_HERO_URL, {
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </section>
