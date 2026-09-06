@@ -5,8 +5,12 @@ import Image from "next/image";
 import Papa from "papaparse";
 // ─── TYPES ────────────────────────────────────────────────────
 interface CartItem {
+  id: number;
   name: string;
   price: number;
+  img: string;
+  catLabel: string;
+  desc: string;
 }
 
 interface Product {
@@ -22,7 +26,7 @@ interface Product {
 
 interface GalItem {
   cat: string;
-  catLabel?: string; // Agregamos esto como opcional
+  catLabel?: string;
   alt: string;
   label: string;
   img: string;
@@ -56,6 +60,7 @@ const EDU_GAL: GalItem[] = [
   { cat:"", alt:"Pintura creativa", label:"Pintura creativa",          img:IMG },
   { cat:"", alt:"Proyecto escolar", label:"Proyectos escolares",        img:IMG },
 ];
+
 const VIDEOS_DATA = [
   { type: "featured", badge: "NUEVO", badgeColor: "var(--red)", dur: "48 min", img: IMG, title: "Técnicas de acuarela para principiantes — Clase completa" },
   { type: "small", badge: "TIPS", badgeColor: "var(--gold)", dur: "12 min", img: IMG, title: "Cómo mezclar colores perfectamente" },
@@ -69,35 +74,44 @@ const PODCAST_DATA = [
   { ep: "EPISODIO 10", title: "Arte corporativo: cuando el diseño habla por la marca", desc: "Casos reales de empresas que transformaron su identidad con proyectos artísticos.", dur: "44 min", img: IMG },
   { ep: "EPISODIO 9", title: "Preparación para Bellas Artes: lo que nadie te dice", desc: "Ex-alumnos comparten sus experiencias, miedos y estrategias para el examen de admisión.", dur: "29 min", img: IMG }
 ];
+
 // ─── TOAST ────────────────────────────────────────────────────
 type ToastItem = { id: number; msg: string; type: "ok" | "info" };
 
 // ─── COMPONENT ────────────────────────────────────────────────
 export default function Home() {
   /* state */
-  const [cart, setCart]         = useState<CartItem[]>([]);
-  const [badgeOn, setBadgeOn]   = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [shrunk, setShrunk]     = useState(false);
-  const [toasts, setToasts]     = useState<ToastItem[]>([]);
-  const [modalOpen, setModalOpen]   = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
-  const [lbSrc, setLbSrc]           = useState<string | null>(null);
-  const [activeTab, setActiveTab]   = useState("todos");
+  const [cart, setCart]           = useState<CartItem[]>([]);
+  const [menuOpen, setMenuOpen]   = useState(false);
+  const [shrunk, setShrunk]       = useState(false);
+  const [toasts, setToasts]       = useState<ToastItem[]>([]);
+  const [modalOpen, setModalOpen]     = useState(false);
+  const [modalTitle, setModalTitle]   = useState("");
+  const [lbSrc, setLbSrc]             = useState<string | null>(null);
+  const [activeTab, setActiveTab]     = useState("todos");
   const [storeFilter, setStoreFilter] = useState("todos");
-  const [mediaTab, setMediaTab]     = useState("videos");
-  const [activePod, setActivePod]   = useState<number | null>(null);
-  const [podPct, setPodPct]         = useState<Record<number, number>>({});
+  const [mediaTab, setMediaTab]       = useState("videos");
+  const [activePod, setActivePod]     = useState<number | null>(null);
+  const [podPct, setPodPct]           = useState<Record<number, number>>({});
   const podTimers = useRef<Record<number, ReturnType<typeof setInterval>>>({});
   const toastId   = useRef(0);
- 
-// Estados para Tienda
+
+  // Vista: "shop" | "cart" | "checkout"
+  const [view, setView]               = useState<"shop"|"cart"|"checkout">("shop");
+  const [cartOpen, setCartOpen]       = useState(false);
+  const [termsOk, setTermsOk]         = useState(false);
+  const [waNumber, setWaNumber]       = useState("");
+  const [checkoutStep, setCheckoutStep] = useState<1|2>(1);
+  const [codeSent, setCodeSent]       = useState(false);
+
+  // Estados para Tienda
   const [productosDin, setProductosDin] = useState<Product[]>([]);
   const [cargando, setCargando] = useState(true);
 
-  // NUEVO: Estados para Portafolio
+  // Estados para Portafolio
   const [portafolioDin, setPortafolioDin] = useState<GalItem[]>([]);
   const [cargandoPort, setCargandoPort] = useState(true);
+
   // Estado para Servicios
   const [serviciosDin, setServiciosDin] = useState<{
     id: number; img: string; color: string; eyebrow: string;
@@ -105,57 +119,63 @@ export default function Home() {
   }[]>([]);
   const [tallerGal, setTallerGal] = useState<{ alt: string; img: string }[]>([]);
   const [showAllTaller, setShowAllTaller] = useState(false);
-// Estado para Hero
-const [heroDin, setHeroDin] = useState<{
-  kicker: string; h1_line1: string; h1_em: string;
-  h1_line2: string; sub: string; btnText: string;
-} | null>(null);
+
+  // Estado para Hero
+  const [heroDin, setHeroDin] = useState<{
+    kicker: string; h1_line1: string; h1_em: string;
+    h1_line2: string; sub: string; btnText: string;
+  } | null>(null);
+
   // LECTURA DE GOOGLE SHEETS
   useEffect(() => {
     const cacheBuster = new Date().getTime();
-    
+
     // 1. Cargar Tienda (Hoja 1)
     const SHEET_TIENDA_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=0&single=true&output=csv&t=${cacheBuster}`;
     Papa.parse(SHEET_TIENDA_URL, {
-      download: true, header: true, dynamicTyping: true, 
+      download: true, header: true, dynamicTyping: true,
       complete: (results) => {
         setProductosDin(results.data as Product[]);
         setCargando(false);
       }
     });
-// Dentro del useEffect de Google Sheets, agrega:
-const SHEET_SERVICIOS_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=2076785391&single=true&output=csv&t=${cacheBuster}`;
-Papa.parse(SHEET_SERVICIOS_URL, {
-  download: true, header: true, dynamicTyping: true,
-  complete: (results) => {
-    setServiciosDin(results.data as typeof serviciosDin);
-  }
-});
-const SHEET_TALLER_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=1153909406&single=true&output=csv&t=${cacheBuster}`;
-Papa.parse(SHEET_TALLER_URL, {
-  download: true, header: true, dynamicTyping: true,
-  complete: (results) => {
-    setTallerGal(results.data as { alt: string; img: string }[]);
-  }
-});
-const SHEET_HERO_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=1839069743&single=true&output=csv&t=${cacheBuster}`;
-Papa.parse(SHEET_HERO_URL, {
-  download: true, header: true, dynamicTyping: true,
-  complete: (results) => {
-    const rows = results.data as typeof heroDin[];
-    if (rows.length > 0) setHeroDin(rows[0]);
-  }
-});
-    // 2. Cargar Portafolio (Hoja 2) - Reemplaza TU_NUEVO_GID por el número que te dio el link
+
+    const SHEET_SERVICIOS_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=2076785391&single=true&output=csv&t=${cacheBuster}`;
+    Papa.parse(SHEET_SERVICIOS_URL, {
+      download: true, header: true, dynamicTyping: true,
+      complete: (results) => {
+        setServiciosDin(results.data as typeof serviciosDin);
+      }
+    });
+
+    const SHEET_TALLER_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=1153909406&single=true&output=csv&t=${cacheBuster}`;
+    Papa.parse(SHEET_TALLER_URL, {
+      download: true, header: true, dynamicTyping: true,
+      complete: (results) => {
+        setTallerGal(results.data as { alt: string; img: string }[]);
+      }
+    });
+
+    const SHEET_HERO_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=1839069743&single=true&output=csv&t=${cacheBuster}`;
+    Papa.parse(SHEET_HERO_URL, {
+      download: true, header: true, dynamicTyping: true,
+      complete: (results) => {
+        const rows = results.data as typeof heroDin[];
+        if (rows.length > 0) setHeroDin(rows[0]);
+      }
+    });
+
+    // 2. Cargar Portafolio (Hoja 2)
     const SHEET_PORTAFOLIO_URL = `https://docs.google.com/spreadsheets/d/e/2PACX-1vR1RUixX9Bkwjg1JjGKAZ7t2R3HZ9ak3_aH87YypUeiSNQaerpPTAA29WtUnkmkT-SQdQL7VJ5DAJRr/pub?gid=303872850&single=true&output=csv&t=${cacheBuster}`;
     Papa.parse(SHEET_PORTAFOLIO_URL, {
-      download: true, header: true, dynamicTyping: true, 
+      download: true, header: true, dynamicTyping: true,
       complete: (results) => {
         setPortafolioDin(results.data as GalItem[]);
         setCargandoPort(false);
       }
     });
   }, []);
+
   /* scroll */
   useEffect(() => {
     const onScroll = () => setShrunk(window.scrollY > 80);
@@ -170,22 +190,46 @@ Papa.parse(SHEET_HERO_URL, {
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3600);
   }, []);
 
-  /* cart */
-  const addCart = (name: string, price: number) => {
-    setCart(c => [...c, { name, price }]);
-    setBadgeOn(true);
-    toast(`"${name}" agregado. Abriendo WhatsApp...`, "ok");
-    setTimeout(() => {
-      const msg = `Hola, estoy interesado en comprar "${name}" por S/ ${price}. ¿Me pueden dar más información?`;
-      window.open(`https://wa.me/51999999999?text=${encodeURIComponent(msg)}`, "_blank");
-    }, 700);
+  /* cart — 1 unidad por producto */
+  const isInCart = (id: number) => cart.some(i => i.id === id);
+
+  const addCart = (p: Product) => {
+    if (isInCart(p.id)) { toast(`"${p.name}" ya está en tu carrito`, "info"); return; }
+    setCart(c => [...c, { id: p.id, name: p.name, price: p.price, img: p.img, catLabel: p.catLabel, desc: p.desc }]);
+    toast(`"${p.name}" agregado al carrito`, "ok");
+    setCartOpen(true);
   };
 
-  const openCart = () => {
-    if (!cart.length) { toast("Tu carrito está vacío", "info"); return; }
-    const lines = cart.map(i => `${i.name} – S/ ${i.price}`).join("%0A");
-    const total = cart.reduce((s, i) => s + i.price, 0);
-    window.open(`https://wa.me/51999999999?text=Hola, me interesan estos productos:%0A${lines}%0ATotal: S/ ${total}`, "_blank");
+  const removeCart = (id: number) => setCart(c => c.filter(i => i.id !== id));
+  const clearCart  = () => setCart([]);
+  const cartTotal  = () => cart.reduce((s, i) => s + i.price, 0).toFixed(2);
+
+  const openCart = () => setCartOpen(true);
+
+  const handleContinuar = () => {
+    if (!termsOk) { toast("Debes aceptar los términos y condiciones", "info"); return; }
+    setCartOpen(false);
+    setView("checkout");
+    setCheckoutStep(1);
+    setCodeSent(false);
+    setWaNumber("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleEnviarCodigo = () => {
+    if (!waNumber.trim()) { toast("Ingresa tu número de WhatsApp", "info"); return; }
+    const lines = cart.map(i => `• ${i.name} — S/ ${i.price}`).join("%0A");
+    const total = cartTotal();
+    const msg = `Hola, quiero confirmar mi pedido:%0A${lines}%0A%0ATotal: S/ ${total}`;
+    window.open(`https://wa.me/51999999999?text=${msg}`, "_blank");
+    setCodeSent(true);
+    setCheckoutStep(2);
+  };
+
+  const handleVolverTienda = () => {
+    setView("shop");
+    setTermsOk(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   /* modal */
@@ -272,7 +316,9 @@ Papa.parse(SHEET_HERO_URL, {
           <div className="hdr-right">
             <button className="cart-btn" onClick={openCart} title="Ver carrito">
               <i className="fa fa-shopping-bag" />
-              <span className={`cart-badge ${badgeOn ? "on" : ""}`}>{cart.length}</span>
+              {cart.length > 0 && (
+                <span className="cart-badge on">{cart.length}</span>
+              )}
             </button>
             <button className={`hbg ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(o => !o)} aria-label="Menú">
               <span /><span /><span />
@@ -300,68 +346,64 @@ Papa.parse(SHEET_HERO_URL, {
         </ul>
       </div>
 
-{/* ===== HERO ===== */}
-<section id="inicio">
-  <div id="hero">
-    {/* Video de fondo en loop, sin audio, sin controles */}
-    <video
-      className="hero-video-bg"
-      src="/taller/videoportada.mp4"
-      autoPlay
-      loop
-      muted
-      playsInline
-      disablePictureInPicture
-      controlsList="nodownload nofullscreen noremoteplayback"
-    />
+      {/* ===== HERO ===== */}
+      <section id="inicio">
+        <div id="hero">
+          <video
+            className="hero-video-bg"
+            src="/taller/videoportada.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            disablePictureInPicture
+            controlsList="nodownload nofullscreen noremoteplayback"
+          />
+          <div className="hero-overlay" />
+          <div className="hero-inner">
+            <p className="hero-kicker">
+              <i className="fa fa-paint-brush" /> {heroDin?.kicker ?? "Lima, Perú — Desde 2015"}
+            </p>
+            <h1 className="hero-h1">
+              {heroDin?.h1_line1 ?? "Creatividad que"}<br />
+              <em>{heroDin?.h1_em ?? "transforma"}</em>{" "}
+              {heroDin?.h1_line2 ?? "vidas"}
+            </h1>
+            <p className="hero-sub">
+              {heroDin?.sub ?? "Educación artística integral, proyectos corporativos y preparación profesional para artistas del futuro."}
+            </p>
+            <a
+              href="#servicios"
+              className="hero-cta"
+              onClick={e => { e.preventDefault(); scrollTo("servicios"); }}
+            >
+              <i className="fa fa-th-large" /> {heroDin?.btnText ?? "Catálogo de servicios"}
+            </a>
 
-    {/* Capa de gradiente semitransparente */}
-    <div className="hero-overlay" />
-
-    <div className="hero-inner">
-      <p className="hero-kicker">
-        <i className="fa fa-paint-brush" /> {heroDin?.kicker ?? "Lima, Perú — Desde 2015"}
-      </p>
-      <h1 className="hero-h1">
-        {heroDin?.h1_line1 ?? "Creatividad que"}<br />
-        <em>{heroDin?.h1_em ?? "transforma"}</em>{" "}
-        {heroDin?.h1_line2 ?? "vidas"}
-      </h1>
-      <p className="hero-sub">
-        {heroDin?.sub ?? "Educación artística integral, proyectos corporativos y preparación profesional para artistas del futuro."}
-      </p>
-      <a
-        href="#servicios"
-        className="hero-cta"
-        onClick={e => { e.preventDefault(); scrollTo("servicios"); }}
-      >
-        <i className="fa fa-th-large" /> {heroDin?.btnText ?? "Catálogo de servicios"}
-      </a>
-
-      {/* ── QR App Banner ── */}
-      <div className="qr-app-banner">
-        <Image
-          src="/taller/qr.png"
-          alt="QR Descarga App"
-          width={72}
-          height={72}
-          style={{ borderRadius: 8, flexShrink: 0, objectFit: "cover" }}
-        />
-        <div className="qr-app-text">
-          <span className="qr-app-title">
-            <i className="fa fa-mobile" /> Descarga nuestra app
-          </span>
-          <span className="qr-app-sub">
-            Escanea el QR con tu cámara y accede desde tu celular
-          </span>
-          <div className="qr-app-chips">
-            <span><i className="fa fa-android" /> Android</span>
+            {/* ── QR App Banner ── */}
+            <div className="qr-app-banner">
+              <Image
+                src="/taller/qr.png"
+                alt="QR Descarga App"
+                width={72}
+                height={72}
+                style={{ borderRadius: 8, flexShrink: 0, objectFit: "cover" }}
+              />
+              <div className="qr-app-text">
+                <span className="qr-app-title">
+                  <i className="fa fa-mobile" /> Descarga nuestra app
+                </span>
+                <span className="qr-app-sub">
+                  Escanea el QR con tu cámara y accede desde tu celular
+                </span>
+                <div className="qr-app-chips">
+                  <span><i className="fa fa-android" /> Android</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* ===== SERVICIOS ===== */}
       <section id="servicios">
@@ -372,32 +414,32 @@ Papa.parse(SHEET_HERO_URL, {
         </div>
         <div className="quad-grid">
           {serviciosDin.map(s => (
-              <div key={s.id} className="svc-card" data-c={s.color} onClick={() => scrollTo(s.scrollTo)}>
-                <div className="svc-thumb">
-                  <img src={s.img} alt={s.title}
-                    style={{ width:"100%", height:"100%", objectFit:"cover",
-                            borderRadius:0, position:"absolute", top:0, left:0 }}
-                    loading="lazy"
-                  />
-                  <div className="svc-ico">
-                    <i className={`fa ${
-                      s.color === "red"   ? "fa-pencil" :
-                      s.color === "blue"  ? "fa-building" :
-                      s.color === "green" ? "fa-graduation-cap" : "fa-shopping-bag"
-                    }`} />
-                  </div>
-                </div>
-                <div className="svc-body">
-                  <span className="eyebrow">{s.eyebrow}</span>
-                  <h3>{s.title}</h3>
-                  <p>{s.desc}</p>
-                  <a href={`#${s.scrollTo}`} className="btn-svc"
-                    onClick={e => { e.preventDefault(); scrollTo(s.scrollTo); }}>
-                    <i className="fa fa-arrow-right" /> {s.btnText}
-                  </a>
+            <div key={s.id} className="svc-card" data-c={s.color} onClick={() => scrollTo(s.scrollTo)}>
+              <div className="svc-thumb">
+                <img src={s.img} alt={s.title}
+                  style={{ width:"100%", height:"100%", objectFit:"cover",
+                          borderRadius:0, position:"absolute", top:0, left:0 }}
+                  loading="lazy"
+                />
+                <div className="svc-ico">
+                  <i className={`fa ${
+                    s.color === "red"   ? "fa-pencil" :
+                    s.color === "blue"  ? "fa-building" :
+                    s.color === "green" ? "fa-graduation-cap" : "fa-shopping-bag"
+                  }`} />
                 </div>
               </div>
-            ))}
+              <div className="svc-body">
+                <span className="eyebrow">{s.eyebrow}</span>
+                <h3>{s.title}</h3>
+                <p>{s.desc}</p>
+                <a href={`#${s.scrollTo}`} className="btn-svc"
+                  onClick={e => { e.preventDefault(); scrollTo(s.scrollTo); }}>
+                  <i className="fa fa-arrow-right" /> {s.btnText}
+                </a>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -414,60 +456,56 @@ Papa.parse(SHEET_HERO_URL, {
             <h3>Talleres de Verano y Clases Particulares</h3>
           </div>
 
-{(() => {
-const VISIBLE_INITIAL = 9;
-  const displayed = showAllTaller ? tallerGal : tallerGal.slice(0, VISIBLE_INITIAL);
-  const hasMore = tallerGal.length > VISIBLE_INITIAL;
+          {(() => {
+            const VISIBLE_INITIAL = 9;
+            const displayed = showAllTaller ? tallerGal : tallerGal.slice(0, VISIBLE_INITIAL);
+            const hasMore = tallerGal.length > VISIBLE_INITIAL;
 
-  return (
-    <div className="edu-collage-wrap">
-      <div className="edu-masonry">
-        {displayed.map((g, i) => (
-          <div
-            key={i}
-            className="edu-mas-item"
-            onClick={() => openLB(g.img)}
-          >
-            <img
-              src={g.img}
-              alt={g.alt}
-              loading="lazy"
-            />
-            <div className="edu-col-ov">
-              <i className="fa fa-expand" />
-              <span>{g.alt}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+            return (
+              <div className="edu-collage-wrap">
+                <div className="edu-masonry">
+                  {displayed.map((g, i) => (
+                    <div
+                      key={i}
+                      className="edu-mas-item"
+                      onClick={() => openLB(g.img)}
+                    >
+                      <img src={g.img} alt={g.alt} loading="lazy" />
+                      <div className="edu-col-ov">
+                        <i className="fa fa-expand" />
+                        <span>{g.alt}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-      {hasMore && !showAllTaller && (
-        <div className="edu-ver-mas-wrap">
-          <div className="edu-ver-mas-fade" />
-          <button
-            className="edu-ver-mas-btn"
-            onClick={() => setShowAllTaller(true)}
-          >
-            <i className="fa fa-images" />
-            Ver más ({tallerGal.length - VISIBLE_INITIAL} fotos más)
-            <i className="fa fa-chevron-down" />
-          </button>
-        </div>
-      )}
+                {hasMore && !showAllTaller && (
+                  <div className="edu-ver-mas-wrap">
+                    <div className="edu-ver-mas-fade" />
+                    <button
+                      className="edu-ver-mas-btn"
+                      onClick={() => setShowAllTaller(true)}
+                    >
+                      <i className="fa fa-images" />
+                      Ver más ({tallerGal.length - VISIBLE_INITIAL} fotos más)
+                      <i className="fa fa-chevron-down" />
+                    </button>
+                  </div>
+                )}
 
-      {showAllTaller && (
-        <div className="edu-colapsar-wrap">
-          <button
-            className="edu-colapsar-btn"
-            onClick={() => setShowAllTaller(false)}
-          >
-            <i className="fa fa-chevron-up" /> Mostrar menos
-          </button>
-        </div>
-      )}
-    </div>
-  );
-})()}
+                {showAllTaller && (
+                  <div className="edu-colapsar-wrap">
+                    <button
+                      className="edu-colapsar-btn"
+                      onClick={() => setShowAllTaller(false)}
+                    >
+                      <i className="fa fa-chevron-up" /> Mostrar menos
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           <div className="cta-row">
             <a href="https://wa.me/51999999999?text=Hola, deseo información sobre los talleres de arte para mi hijo" className="btn btn-wa" target="_blank" rel="noreferrer">
@@ -539,18 +577,18 @@ const VISIBLE_INITIAL = 9;
             <h3>Proyectos corporativos Realizados</h3>
           </div>
 
-{/* Tabs Dinámicos */}
+          {/* Tabs Dinámicos */}
           <div className="tab-nav">
-            <button 
-              className={`tab ${activeTab === "todos" ? "active" : ""}`} 
+            <button
+              className={`tab ${activeTab === "todos" ? "active" : ""}`}
               onClick={() => setActiveTab("todos")}
             >
               Todos
             </button>
             {Array.from(new Map(portafolioDin.filter(g => g.cat).map(g => [g.cat, g.catLabel || g.cat])).entries()).map(([f, label]) => (
-              <button 
-                key={f as string} 
-                className={`tab ${activeTab === f ? "active" : ""}`} 
+              <button
+                key={f as string}
+                className={`tab ${activeTab === f ? "active" : ""}`}
                 onClick={() => setActiveTab(f as string)}
               >
                 {label as string}
@@ -567,7 +605,6 @@ const VISIBLE_INITIAL = 9;
             ) : (
               portafolioDin.filter(g => visible(g.cat, activeTab)).map((g, i) => (
                 <div key={i} className="gal-item" onClick={() => openLB(g.img)}>
-                  {/* Ya aplicamos el <img /> directo para evitar errores 400 */}
                   <img src={g.img} alt={g.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
                   <div className="gal-ov">
                     <i className="fa fa-expand" />
@@ -577,8 +614,6 @@ const VISIBLE_INITIAL = 9;
               ))
             )}
           </div>
-
-        
 
           <div className="cta-row" style={{ marginTop:"2rem" }}>
             <button className="btn btn-gold" onClick={() => toast("Descargando dossier de proyectos...", "info")}>
@@ -660,19 +695,16 @@ const VISIBLE_INITIAL = 9;
           </div>
 
           <div className="filt-nav">
-            {/* 1. El botón "Todos" siempre queda fijo al inicio */}
-            <button 
-              className={`filt ${storeFilter === "todos" ? "active" : ""}`} 
+            <button
+              className={`filt ${storeFilter === "todos" ? "active" : ""}`}
               onClick={() => setStoreFilter("todos")}
             >
               Todos
             </button>
-            
-            {/* 2. Generamos los botones leyendo las categorías de tu Google Sheet sin repetirlas */}
             {Array.from(new Map(productosDin.filter(p => p.cat).map(p => [p.cat, p.catLabel])).entries()).map(([f, label]) => (
-              <button 
-                key={f as string} 
-                className={`filt ${storeFilter === f ? "active" : ""}`} 
+              <button
+                key={f as string}
+                className={`filt ${storeFilter === f ? "active" : ""}`}
                 onClick={() => setStoreFilter(f as string)}
               >
                 {label as string}
@@ -680,29 +712,34 @@ const VISIBLE_INITIAL = 9;
             ))}
           </div>
 
-  <div className="prod-grid">
-  {cargando ? (
-    <p>Cargando catálogo...</p>
-  ) : (
-    productosDin.filter(p => visible(p.cat, storeFilter)).map((p, index) => (
-      <div key={p.id || index} className="prod-card">
-        <div className="prod-thumb">
-              <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
-              {p.badge && <span className="prod-badge">{p.badge}</span>}
-            </div>
-        <div className="prod-body">
-          <p className="prod-cat">{p.catLabel}</p>
-          <h4>{p.name}</h4>
-          <p>{p.desc}</p>
-          <div className="prod-price">S/ {p.price}</div>
-          <button className="btn-buy" onClick={() => addCart(p.name, p.price)}>
-            <i className="fa fa-whatsapp" /> Comprar
-          </button>
-        </div>
-      </div>
-    ))
-  )}
-</div>
+          <div className="prod-grid">
+            {cargando ? (
+              <p>Cargando catálogo...</p>
+            ) : (
+              productosDin.filter(p => visible(p.cat, storeFilter)).map((p, index) => (
+                <div key={p.id || index} className="prod-card">
+                  <div className="prod-thumb">
+                    <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
+                    {p.badge && <span className="prod-badge">{p.badge}</span>}
+                  </div>
+                  <div className="prod-body">
+                    <p className="prod-cat">{p.catLabel}</p>
+                    <h4>{p.name}</h4>
+                    <p>{p.desc}</p>
+                    <div className="prod-price">S/ {p.price}</div>
+                    <button
+                      className={`btn-buy ${isInCart(p.id) ? "in-cart" : ""}`}
+                      onClick={() => addCart(p)}
+                      disabled={isInCart(p.id)}
+                    >
+                      <i className={`fa ${isInCart(p.id) ? "fa-check" : "fa-shopping-bag"}`} />
+                      {isInCart(p.id) ? "En carrito" : "Agregar"}
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
 
           {/* Métodos de pago */}
           <div className="pay-strip">
@@ -722,10 +759,9 @@ const VISIBLE_INITIAL = 9;
         </div>
       </section>
 
-{/* ===== MEDIA ===== */}
-{/* ===== MEDIA ===== */}
+      {/* ===== MEDIA ===== */}
       <section id="media" style={{ background:"linear-gradient(180deg,var(--canvas) 0%,#f4f2ff 100%)", padding:"3rem 5% 4rem", position:"relative" }}>
-        
+
         {/* ── Overlay Próxima Apertura ── */}
         <div className="media-coming-overlay">
           <div className="media-coming-box">
@@ -745,12 +781,12 @@ const VISIBLE_INITIAL = 9;
             </div>
           </div>
         </div>
-                <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-          
-          {/* Header estilizado según imagen */}
+
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+
           <div className="media-header">
             <h2 className="media-title">
-              <i className="fa fa-play-circle" style={{ color: "var(--blue)" }} /> 
+              <i className="fa fa-play-circle" style={{ color: "var(--blue)" }} />
               Videos &amp; Podcast
             </h2>
             <p>Contenido exclusivo sobre arte, creatividad y técnicas. Tutoriales, entrevistas y episodios para inspirarte.</p>
@@ -758,14 +794,14 @@ const VISIBLE_INITIAL = 9;
 
           {/* Media Tabs Estilo Pill */}
           <div className="media-tabs-styled">
-            <button 
-              className={`media-tab-btn ${mediaTab === "videos" ? "active-vid" : ""}`} 
+            <button
+              className={`media-tab-btn ${mediaTab === "videos" ? "active-vid" : ""}`}
               onClick={() => setMediaTab("videos")}
             >
               <i className="fa fa-youtube-play" /> Videos
             </button>
-            <button 
-              className={`media-tab-btn ${mediaTab === "podcast" ? "active-pod" : ""}`} 
+            <button
+              className={`media-tab-btn ${mediaTab === "podcast" ? "active-pod" : ""}`}
               onClick={() => setMediaTab("podcast")}
             >
               <i className="fa fa-microphone" /> Podcast
@@ -776,7 +812,6 @@ const VISIBLE_INITIAL = 9;
           {mediaTab === "videos" && (
             <div>
               <div className="media-bento">
-                {/* Video Destacado (Izquierda) */}
                 <div className="vid-card-styled featured">
                   <img src={VIDEOS_DATA[0].img} alt={VIDEOS_DATA[0].title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
                   <div className="vid-badge" style={{ background: VIDEOS_DATA[0].badgeColor }}>{VIDEOS_DATA[0].badge}</div>
@@ -787,9 +822,8 @@ const VISIBLE_INITIAL = 9;
                   </div>
                 </div>
 
-                {/* Videos Pequeños (Derecha) */}
-                <div className="media-bento-right"> 
-                 {VIDEOS_DATA.slice(1).map((v, i) => (
+                <div className="media-bento-right">
+                  {VIDEOS_DATA.slice(1).map((v, i) => (
                     <div key={i} className="vid-card-styled small">
                       <img src={v.img} alt={v.title} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 0, position: 'absolute', top: 0, left: 0 }} loading="lazy" />
                       <div className="vid-badge" style={{ background: v.badgeColor }}>{v.badge}</div>
@@ -802,7 +836,6 @@ const VISIBLE_INITIAL = 9;
                 </div>
               </div>
 
-              {/* Botones de acción inferior */}
               <div className="cta-row" style={{ marginTop: "2rem", justifyContent: "center" }}>
                 <a href="https://www.youtube.com/@tallerarte" target="_blank" rel="noreferrer" className="btn btn-red">
                   <i className="fa fa-youtube-play" /> Ver canal completo
@@ -821,16 +854,14 @@ const VISIBLE_INITIAL = 9;
                 {PODCAST_DATA.map((pod, i) => (
                   <div key={i} className="pod-card-styled">
                     <img src={pod.img} alt={pod.ep} className="pod-thumb-sq" />
-                    
                     <div className="pod-content">
                       <span className="pod-ep-label">{pod.ep}</span>
                       <h4>{pod.title}</h4>
                       <p>{pod.desc}</p>
                     </div>
-
                     <div className="pod-action">
-                      <button className="pod-play-grad">
-                        <i className="fa fa-play" style={{ marginLeft: "3px" }} />
+                      <button className="pod-play-grad" onClick={() => togglePod(i)}>
+                        <i className={`fa ${activePod === i ? "fa-pause" : "fa-play"}`} style={{ marginLeft: "3px" }} />
                       </button>
                       <span>{pod.dur}</span>
                     </div>
@@ -838,7 +869,6 @@ const VISIBLE_INITIAL = 9;
                 ))}
               </div>
 
-              {/* Botones de acción inferior */}
               <div className="cta-row" style={{ marginTop: "2rem", justifyContent: "center" }}>
                 <a href="#" className="btn" style={{ background: "#1DB954", color: "#fff" }}>
                   <i className="fa fa-spotify" /> Escuchar en Spotify
@@ -906,7 +936,7 @@ const VISIBLE_INITIAL = 9;
         <i className="fa fa-whatsapp" />
       </button>
 
-      {/* ===== MODAL ===== */}
+      {/* ===== MODAL COTIZACIÓN ===== */}
       {modalOpen && (
         <div className="modal-ov on" onClick={e => { if (e.target === e.currentTarget) closeM(); }}>
           <div className="modal-box">
@@ -914,18 +944,9 @@ const VISIBLE_INITIAL = 9;
             <h3>{modalTitle}</h3>
             <p className="modal-sub">Completa el formulario y te contactamos en menos de 24 horas.</p>
             <form onSubmit={e => { e.preventDefault(); closeM(); toast("¡Mensaje enviado! Te contactaremos pronto.", "ok"); (e.target as HTMLFormElement).reset(); }}>
-              <div className="fgrp">
-                <label>Nombre</label>
-                <input type="text" placeholder="Tu nombre completo" required />
-              </div>
-              <div className="fgrp">
-                <label>Teléfono / WhatsApp</label>
-                <input type="tel" placeholder="+51 999 999 999" required />
-              </div>
-              <div className="fgrp">
-                <label>Mensaje</label>
-                <textarea placeholder="Cuéntanos sobre tu proyecto..." required />
-              </div>
+              <div className="fgrp"><label>Nombre</label><input type="text" placeholder="Tu nombre completo" required /></div>
+              <div className="fgrp"><label>Teléfono / WhatsApp</label><input type="tel" placeholder="+51 999 999 999" required /></div>
+              <div className="fgrp"><label>Mensaje</label><textarea placeholder="Cuéntanos sobre tu proyecto..." required /></div>
               <button type="submit" className="btn btn-red" style={{ width:"100%", justifyContent:"center" }}>
                 <i className="fa fa-paper-plane" /> Enviar Mensaje
               </button>
@@ -940,6 +961,178 @@ const VISIBLE_INITIAL = 9;
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={lbSrc} alt="Galería" className="lb-img" />
           <button className="lb-x" onClick={closeLB}><i className="fa fa-times" /></button>
+        </div>
+      )}
+
+      {/* ===== CARRITO LATERAL ===== */}
+      {cartOpen && (
+        <div className="cart-overlay" onClick={e => { if (e.target === e.currentTarget) setCartOpen(false); }}>
+          <div className="cart-drawer">
+            {/* Header */}
+            <div className="cart-drawer-hdr">
+              <div>
+                <h3 className="cart-drawer-title">Mi Carrito</h3>
+                <p className="cart-drawer-sub">{cart.length} producto{cart.length !== 1 ? "s" : ""} en tu pedido</p>
+              </div>
+              <button className="cart-drawer-x" onClick={() => setCartOpen(false)}>
+                <i className="fa fa-times" />
+              </button>
+            </div>
+
+            {/* Lista de productos */}
+            <div className="cart-drawer-body">
+              {cart.length === 0 ? (
+                <div className="cart-empty">
+                  <i className="fa fa-shopping-bag" />
+                  <p>Tu carrito está vacío</p>
+                </div>
+              ) : (
+                cart.map(item => (
+                  <div key={item.id} className="cart-row">
+                    <img src={item.img} alt={item.name} className="cart-row-img" />
+                    <div className="cart-row-info">
+                      <span className="cart-row-cat">{item.catLabel}</span>
+                      <p className="cart-row-name">{item.name}</p>
+                      <span className="cart-row-desc">{item.desc}</span>
+                    </div>
+                    <div className="cart-row-right">
+                      <span className="cart-row-price">S/ {item.price.toFixed(2)}</span>
+                      <button className="cart-row-del" onClick={() => removeCart(item.id)} title="Eliminar">
+                        <i className="fa fa-trash-o" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Footer / Resumen */}
+            {cart.length > 0 && (
+              <div className="cart-drawer-footer">
+                <div className="cart-resumen">
+                  <span className="cart-resumen-label">RESUMEN</span>
+                  <div className="cart-resumen-row">
+                    <span>Subtotal</span>
+                    <span>S/ {cartTotal()}</span>
+                  </div>
+                  <div className="cart-resumen-row total">
+                    <span>Total</span>
+                    <strong>S/ {cartTotal()}</strong>
+                  </div>
+                </div>
+
+                <label className="cart-terms">
+                  <input
+                    type="checkbox"
+                    checked={termsOk}
+                    onChange={e => setTermsOk(e.target.checked)}
+                  />
+                  <span>Acepto los <a href="#" onClick={e => e.preventDefault()}>términos y condiciones</a></span>
+                </label>
+
+                <button className="cart-continuar-btn" onClick={handleContinuar}>
+                  Continuar pedido <i className="fa fa-arrow-right" />
+                </button>
+
+                <button className="cart-vaciar-btn" onClick={() => { clearCart(); setTermsOk(false); }}>
+                  <i className="fa fa-trash-o" /> Vaciar carrito
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ===== PÁGINA FINALIZAR PEDIDO ===== */}
+      {view === "checkout" && (
+        <div className="checkout-page">
+          <div className="checkout-wrap">
+            <button className="checkout-back" onClick={() => { setView("shop"); setCartOpen(true); }}>
+              <i className="fa fa-arrow-left" /> Volver al carrito
+            </button>
+            <h2 className="checkout-title">FINALIZAR PEDIDO</h2>
+
+            {/* Banner WA */}
+            <div className="checkout-wa-banner">
+              <i className="fa fa-whatsapp" style={{ fontSize:"1.5rem", color:"#25D366" }} />
+              <div>
+                <strong>Tu pedido se gestiona por WhatsApp</strong>
+                <p>Verifica tu número y confirma el pedido. Luego un asesor continuará la atención contigo por WhatsApp.</p>
+                <p>Recibirás la constancia por WhatsApp y el asesor confirmará disponibilidad, forma de pago y entrega. <strong>No se realiza ningún pago en esta web.</strong></p>
+              </div>
+            </div>
+
+            <div className="checkout-grid">
+              {/* Izquierda: pasos */}
+              <div className="checkout-steps">
+
+                {/* Paso 1 */}
+                <div className={`checkout-step ${checkoutStep >= 1 ? "active" : ""}`}>
+                  <div className="checkout-step-hdr">
+                    <span className="checkout-step-num">1</span>
+                    <span className="checkout-step-label">TU WHATSAPP</span>
+                  </div>
+                  {checkoutStep === 1 && (
+                    <div className="checkout-step-body">
+                      <p>Te enviaremos un código por WhatsApp para confirmar que el número es tuyo. Por ahí recibirás la constancia del pedido.</p>
+                      <div className="checkout-wa-input">
+                        <span className="checkout-wa-prefix">🇵🇪 +51</span>
+                        <input
+                          type="tel"
+                          placeholder="Ingresa tu número de WhatsApp"
+                          value={waNumber}
+                          onChange={e => setWaNumber(e.target.value)}
+                        />
+                      </div>
+                      <button className="checkout-send-btn" onClick={handleEnviarCodigo}>
+                        <i className="fa fa-whatsapp" /> Enviarme el código
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Paso 2 */}
+                <div className={`checkout-step ${checkoutStep >= 2 ? "active" : "disabled"}`}>
+                  <div className="checkout-step-hdr">
+                    <span className="checkout-step-num">2</span>
+                    <span className="checkout-step-label">CONFIRMAR PEDIDO</span>
+                  </div>
+                  {checkoutStep === 2 && (
+                    <div className="checkout-step-body">
+                      <p>Código enviado a <strong>+51 {waNumber}</strong>. Revisa tu WhatsApp y confirma el pedido con el asesor.</p>
+                      <div className="checkout-success">
+                        <i className="fa fa-check-circle" />
+                        <span>¡Pedido enviado! Un asesor se contactará contigo en breve.</span>
+                      </div>
+                      <button className="checkout-send-btn" style={{ background:"var(--green)", marginTop:"1rem" }} onClick={handleVolverTienda}>
+                        <i className="fa fa-shopping-bag" /> Seguir comprando
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              {/* Derecha: resumen */}
+              <div className="checkout-summary">
+                <h4>TU PEDIDO</h4>
+                {cart.map(item => (
+                  <div key={item.id} className="checkout-sum-row">
+                    <img src={item.img} alt={item.name} />
+                    <div className="checkout-sum-info">
+                      <p>{item.name}</p>
+                      <span>1 × S/ {item.price.toFixed(2)}</span>
+                    </div>
+                    <strong>S/ {item.price.toFixed(2)}</strong>
+                  </div>
+                ))}
+                <div className="checkout-sum-total">
+                  <span>Total</span>
+                  <strong>S/ {cartTotal()}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
