@@ -147,16 +147,40 @@ h4 { font-size: 1rem; }
 #hdr {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
   background: var(--background);
-  border-bottom: 4px solid transparent;
-  border-image: linear-gradient(90deg,#D4006A,#E8A800,#0099C8,#1A7A3C) 1;
   height: 72px;
   display: flex; align-items: center;
   box-shadow: 0 2px 20px rgba(0,0,0,.10);
   transition: height var(--ease), box-shadow var(--ease);
+  /* Sin border-bottom aquí — lo maneja el ::before */
 }
 #hdr.shrunk { height: 58px; box-shadow: 0 4px 20px rgba(0,0,0,.12); }
 #hdr .wrap  { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+#hdr::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #d4006a,
+    #e8a800,
+    #0099c8,
+    #1a7a3c,
+    #2060e8,
+    #d4006a,   /* repite el inicio para que el loop sea suave */
+    #e8a800,
+    #0099c8,
+    #1a7a3c,
+    #2060e8
+  );
+  background-size: 200% 100%;
+  animation: hdrRainbow 4s linear infinite;
+}
 
+@keyframes hdrRainbow {
+  0%   { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}s
 .logo         { display: flex; align-items: center; gap: .6rem; text-decoration: none; }
 .logo-img     { height: 52px; width: auto; border-radius: 50%; object-fit: cover; transition: height var(--ease); filter: drop-shadow(0 2px 6px rgba(0,153,200,.35)); }
 #hdr.shrunk .logo-img { height: 42px; }
@@ -1179,8 +1203,20 @@ h4 { font-size: 1rem; }
     radial-gradient(ellipse 40% 50% at 50% 100%, rgba(232,168,0,.08) 0%, transparent 60%),
     linear-gradient(160deg, #f0ecff 0%, #e6f7ff 45%, #fffbea 100%);
   color: var(--t-mid); padding: 4rem 5% 2rem; margin-top: 4rem;
-  border-top: 4px solid transparent;
-  border-image: linear-gradient(90deg, #D4006A, #E8A800, #0099C8, #1A7A3C) 1;
+border-top: none;
+position: relative;}
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    #d4006a, #e8a800, #0099c8, #1a7a3c, #2060e8,
+    #d4006a, #e8a800, #0099c8, #1a7a3c, #2060e8
+  );
+  background-size: 200% 100%;
+  animation: hdrRainbow 4s linear infinite;
 }
 .foot-grid { max-width: 1280px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; padding-bottom: 2.5rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
 .foot-brand .logo { display: flex; margin-bottom: 1rem; }
