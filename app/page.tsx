@@ -723,8 +723,29 @@ const VISIBLE_INITIAL = 9;
       </section>
 
 {/* ===== MEDIA ===== */}
-      <section id="media" style={{ background:"linear-gradient(180deg,var(--canvas) 0%,#f4f2ff 100%)", padding:"3rem 5% 4rem" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+{/* ===== MEDIA ===== */}
+      <section id="media" style={{ background:"linear-gradient(180deg,var(--canvas) 0%,#f4f2ff 100%)", padding:"3rem 5% 4rem", position:"relative" }}>
+        
+        {/* ── Overlay Próxima Apertura ── */}
+        <div className="media-coming-overlay">
+          <div className="media-coming-box">
+            <div className="media-coming-icon">
+              <i className="fa fa-play-circle" />
+            </div>
+            <span className="media-coming-eyebrow">Sección en construcción</span>
+            <h3 className="media-coming-title">Próxima Apertura</h3>
+            <p className="media-coming-sub">
+              Estamos preparando contenido exclusivo para ti.<br />
+              Videos, tutoriales y podcast muy pronto.
+            </p>
+            <div className="media-coming-chips">
+              <span><i className="fa fa-youtube-play" /> Videos</span>
+              <span><i className="fa fa-microphone" /> Podcast</span>
+              <span><i className="fa fa-bell" /> Notificaciones</span>
+            </div>
+          </div>
+        </div>
+                <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           
           {/* Header estilizado según imagen */}
           <div className="media-header">
