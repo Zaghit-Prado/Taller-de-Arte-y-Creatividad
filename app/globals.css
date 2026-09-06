@@ -600,6 +600,34 @@ h4 { font-size: 1rem; }
   .checkout-grid { grid-template-columns: 1fr; }
   .cart-drawer   { max-width: 100%; }
 }
+.taller-desc-box {
+  margin: 1.5rem 0 2rem;
+  padding: 1.5rem 1.75rem;
+  background: var(--white);
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,.07);
+}
+
+.taller-desc-lead {
+  font-size: 1.05rem;
+  color: var(--t-main);
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+}
+
+.taller-desc-subtitle {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--t-main);
+  margin-bottom: .75rem;
+}
+
+.taller-desc-cta {
+  margin-top: 1.25rem;
+  font-weight: 600;
+  color: var(--red);
+  font-size: .95rem;
+}
 .media-coming-chips span {
   display: inline-flex;
   align-items: center;

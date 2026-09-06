@@ -212,8 +212,33 @@ export default function Home() {
             <h2>Despierta el talento, asegura las mejores calificaciones</h2>
             <p>Programas especializados para desarrollar la creatividad y el éxito académico de tus hijos.</p>
           </div>
-          <div className="sec-h"><span className="eyebrow">Talleres</span><h3>Talleres de Verano y Clases Particulares</h3></div>
-          {(()=>{
+<div className="sec-h"><span className="eyebrow">Talleres</span><h3>Talleres de Verano y Clases Particulares</h3></div>
+
+{/* ── Descripción del taller ── */}
+<div className="taller-desc-box">
+  <p className="taller-desc-lead">
+    ¡Despierta la creatividad y el talento artístico de tus hijos! En nuestro{" "}
+    <strong>Taller de Arte y Creatividad</strong> aprenderán a soltar la imaginación,
+    expresarse sin miedo y desarrollar su paciencia mientras crean verdaderas obras de arte.
+  </p>
+  <p className="taller-desc-subtitle">¿Qué aprenderán?</p>
+  <div className="feat-grid">
+    {[
+      { bg:"#FDE8F3", color:"var(--red)",   icon:"fa-paint-brush", title:"Dibujo y Pintura",       desc:"Técnicas tradicionales y creativas para expresarse con libertad." },
+      { bg:"#E5F5FA", color:"var(--blue)",  icon:"fa-tint",        title:"Color y Composición",    desc:"Exploración del color, mezclas y teoría de la composición visual." },
+      { bg:"#EFF7F3", color:"var(--green)", icon:"fa-child",       title:"Personajes y Animación", desc:"Diseño de personajes y animación de sus figuras favoritas." },
+      { bg:"#FEF6E4", color:"var(--gold)",  icon:"fa-star",        title:"Clases Personalizadas",  desc:"Adaptadas al ritmo de cada alumno en un entorno divertido y seguro." },
+    ].map((f,i)=>(
+      <div key={i} className="feat-item">
+        <div className="feat-ico" style={{background:f.bg,color:f.color}}><i className={`fa ${f.icon}`}/></div>
+        <div><h4>{f.title}</h4><p>{f.desc}</p></div>
+      </div>
+    ))}
+  </div>
+  <p className="taller-desc-cta">¡Cupos limitados! Pide información e inscríbete.</p>
+</div>
+
+{(()=>{
             const VI=9; const displayed=showAllTaller?tallerGal:tallerGal.slice(0,VI); const hasMore=tallerGal.length>VI;
             return(
               <div className="edu-collage-wrap">
