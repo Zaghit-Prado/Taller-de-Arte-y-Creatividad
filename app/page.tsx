@@ -221,7 +221,7 @@ export default function Home() {
     const lines = cart.map(i => `• ${i.name} — S/ ${i.price}`).join("%0A");
     const total = cartTotal();
     const msg = `Hola, quiero confirmar mi pedido:%0A${lines}%0A%0ATotal: S/ ${total}`;
-    window.open(`https://wa.me/51999999999?text=${msg}`, "_blank");
+    window.open(`https://wa.me/51925929447?text=${msg}`, "_blank");
     setCodeSent(true);
     setCheckoutStep(2);
   };
@@ -508,7 +508,7 @@ export default function Home() {
           })()}
 
           <div className="cta-row">
-            <a href="https://wa.me/51999999999?text=Hola, deseo información sobre los talleres de arte para mi hijo" className="btn btn-wa" target="_blank" rel="noreferrer">
+            <a href="https://wa.me/51925929447?text=Hola, deseo información sobre los talleres de arte para mi hijo" className="btn btn-wa" target="_blank" rel="noreferrer">
               <i className="fa fa-whatsapp" /> Inscribirse por WhatsApp
             </a>
             <button className="btn btn-outline blue" onClick={() => toast("Lunes–Viernes 3pm–7pm · Sábados 9am–1pm", "info")}>
@@ -676,7 +676,7 @@ export default function Home() {
           </div>
 
           <div className="cta-row">
-            <a href="https://wa.me/51999999999?text=Hola, quiero información sobre el ciclo de preparación para Bellas Artes" className="btn btn-wa" target="_blank" rel="noreferrer">
+            <a href="https://wa.me/51925929447?text=Hola, quiero información sobre el ciclo de preparación para Bellas Artes" className="btn btn-wa" target="_blank" rel="noreferrer">
               <i className="fa fa-whatsapp" /> Clase Modelo Gratis
             </a>
             <button className="btn btn-outline green" onClick={() => toast("Ciclo regular: S/ 300 mensuales. Incluye materiales básicos.", "info")}>
