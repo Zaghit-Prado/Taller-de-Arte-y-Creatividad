@@ -54,7 +54,7 @@ export default function Header({ cartCount = 0, onCartClick, useScrollNav = fals
               alt="Taller Arte"
               width={52}
               height={52}
-              style={{ borderRadius: "50%", flexShrink: 0, objectFit: "cover" }}
+              style={{ flexShrink: 0, objectFit: "cover" }}
             />
           
           </a>
