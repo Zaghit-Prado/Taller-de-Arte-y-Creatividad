@@ -56,9 +56,7 @@ export default function Header({ cartCount = 0, onCartClick, useScrollNav = fals
               height={52}
               style={{ borderRadius: "50%", flexShrink: 0, objectFit: "cover" }}
             />
-            <span className="logo-text">
-              Taller Estudio<span>Arte &amp; Creatividad</span>
-            </span>
+          
           </a>
 
           {/* Nav desktop */}
