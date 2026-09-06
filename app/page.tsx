@@ -104,6 +104,7 @@ export default function Home() {
     title: string; desc: string; btnText: string; scrollTo: string;
   }[]>([]);
   const [tallerGal, setTallerGal] = useState<{ alt: string; img: string }[]>([]);
+  const [showAllTaller, setShowAllTaller] = useState(false);
 // Estado para Hero
 const [heroDin, setHeroDin] = useState<{
   kicker: string; h1_line1: string; h1_em: string;
@@ -414,27 +415,60 @@ Papa.parse(SHEET_HERO_URL, {
             <p>Desde S/ 200 por mes &middot; Lunes a Sábado</p>
           </div>
 
-<div className="edu-collage">
-  {tallerGal.map((g, i) => (
-    <div
-      key={i}
-      className={`edu-col-item edu-col-item--${i % 7}`}
-      onClick={() => openLB(g.img)}
-    >
-      <img
-        src={g.img}
-        alt={g.alt}
-        style={{ width:"100%", height:"100%", objectFit:"cover",
-                 display:"block", borderRadius:0 }}
-        loading="lazy"
-      />
-      <div className="edu-col-ov">
-        <i className="fa fa-expand" />
-        <span>{g.alt}</span>
+{(() => {
+  const VISIBLE_INITIAL = 7;
+  const displayed = showAllTaller ? tallerGal : tallerGal.slice(0, VISIBLE_INITIAL);
+  const hasMore = tallerGal.length > VISIBLE_INITIAL;
+
+  return (
+    <div className="edu-collage-wrap">
+      <div className="edu-masonry">
+        {displayed.map((g, i) => (
+          <div
+            key={i}
+            className="edu-mas-item"
+            onClick={() => openLB(g.img)}
+          >
+            <img
+              src={g.img}
+              alt={g.alt}
+              loading="lazy"
+            />
+            <div className="edu-col-ov">
+              <i className="fa fa-expand" />
+              <span>{g.alt}</span>
+            </div>
+          </div>
+        ))}
       </div>
+
+      {hasMore && !showAllTaller && (
+        <div className="edu-ver-mas-wrap">
+          <div className="edu-ver-mas-fade" />
+          <button
+            className="edu-ver-mas-btn"
+            onClick={() => setShowAllTaller(true)}
+          >
+            <i className="fa fa-images" />
+            Ver más ({tallerGal.length - VISIBLE_INITIAL} fotos más)
+            <i className="fa fa-chevron-down" />
+          </button>
+        </div>
+      )}
+
+      {showAllTaller && (
+        <div className="edu-colapsar-wrap">
+          <button
+            className="edu-colapsar-btn"
+            onClick={() => setShowAllTaller(false)}
+          >
+            <i className="fa fa-chevron-up" /> Mostrar menos
+          </button>
+        </div>
+      )}
     </div>
-  ))}
-</div>
+  );
+})()}
 
           <div className="cta-row">
             <a href="https://wa.me/51999999999?text=Hola, deseo información sobre los talleres de arte para mi hijo" className="btn btn-wa" target="_blank" rel="noreferrer">
