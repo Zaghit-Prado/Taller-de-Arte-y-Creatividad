@@ -412,7 +412,6 @@ Papa.parse(SHEET_HERO_URL, {
           <div className="sec-h">
             <span className="eyebrow">Talleres</span>
             <h3>Talleres de Verano y Clases Particulares</h3>
-            <p>Desde S/ 200 por mes &middot; Lunes a Sábado</p>
           </div>
 
 {(() => {
