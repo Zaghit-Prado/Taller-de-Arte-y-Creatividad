@@ -416,7 +416,7 @@ Papa.parse(SHEET_HERO_URL, {
           </div>
 
 {(() => {
-  const VISIBLE_INITIAL = 7;
+const VISIBLE_INITIAL = 8;
   const displayed = showAllTaller ? tallerGal : tallerGal.slice(0, VISIBLE_INITIAL);
   const hasMore = tallerGal.length > VISIBLE_INITIAL;
 
